@@ -97,6 +97,12 @@ class SettingsStore:
         )
         self.save()
 
+    def _parse_bool(self, value: str) -> bool:
+        normalized = value.strip().lower()
+        if normalized in {"true", "false"}:
+            return normalized == "true"
+        return bool(int(value))
+
     def _apply_setting(self, key: str, value: str) -> None:
         if key == "sampling_interval_sec":
             self._settings.sampling_interval_sec = int(value)
@@ -105,7 +111,7 @@ class SettingsStore:
         elif key == "retention_days":
             self._settings.retention_days = int(value)
         elif key == "close_to_tray":
-            self._settings.close_to_tray = bool(int(value))
+            self._settings.close_to_tray = self._parse_bool(value)
         elif key == "focus_start":
             hour, minute = [int(part) for part in value.split(":")]
             self._settings.focus_start = time(hour, minute)
@@ -113,6 +119,6 @@ class SettingsStore:
             hour, minute = [int(part) for part in value.split(":")]
             self._settings.focus_end = time(hour, minute)
         elif key == "prompts_enabled":
-            self._settings.prompts_enabled = bool(int(value))
+            self._settings.prompts_enabled = self._parse_bool(value)
         elif key == "distraction_categories":
             self._settings.distraction_categories = json.loads(value)
